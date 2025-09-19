@@ -15,6 +15,25 @@ export interface PlanetPosition {
   nakshatraPada: number
 }
 
+export interface SimplePlanetPosition {
+  sign: string
+  degree: number
+  house: number
+  nakshatra: string
+}
+
+export interface PlanetaryPositions {
+  sun: SimplePlanetPosition
+  moon: SimplePlanetPosition
+  mars: SimplePlanetPosition
+  mercury: SimplePlanetPosition
+  jupiter: SimplePlanetPosition
+  venus: SimplePlanetPosition
+  saturn: SimplePlanetPosition
+  rahu: SimplePlanetPosition
+  ketu: SimplePlanetPosition
+}
+
 export interface ZodiacSign {
   name: string
   sanskritName: string
@@ -37,6 +56,7 @@ export interface House {
 interface PlanetaryState {
   planets: PlanetPosition[]
   houses: House[]
+  currentPositions: PlanetaryPositions
   ascendant: {
     sign: string
     degree: number
@@ -53,6 +73,17 @@ interface PlanetaryState {
 const initialState: PlanetaryState = {
   planets: [],
   houses: [],
+  currentPositions: {
+    sun: { sign: "Leo", degree: 23, house: 12, nakshatra: "Purva Phalguni" },
+    moon: { sign: "Cancer", degree: 7, house: 11, nakshatra: "Pushya" },
+    mars: { sign: "Aries", degree: 15, house: 8, nakshatra: "Bharani" },
+    mercury: { sign: "Virgo", degree: 2, house: 1, nakshatra: "Uttara Phalguni" },
+    jupiter: { sign: "Taurus", degree: 9, house: 9, nakshatra: "Rohini" },
+    venus: { sign: "Libra", degree: 18, house: 2, nakshatra: "Swati" },
+    saturn: { sign: "Capricorn", degree: 25, house: 5, nakshatra: "Dhanishta" },
+    rahu: { sign: "Gemini", degree: 12, house: 10, nakshatra: "Ardra" },
+    ketu: { sign: "Sagittarius", degree: 12, house: 4, nakshatra: "Mula" },
+  },
   ascendant: {
     sign: "",
     degree: 0,
@@ -76,6 +107,10 @@ const planetarySlice = createSlice({
     },
     setHouses: (state, action: PayloadAction<House[]>) => {
       state.houses = action.payload
+    },
+    updatePlanetaryPositions: (state, action: PayloadAction<PlanetaryPositions>) => {
+      state.currentPositions = action.payload
+      state.lastUpdated = new Date().toISOString()
     },
     setAscendant: (state, action: PayloadAction<{ sign: string; degree: number; nakshatra: string }>) => {
       state.ascendant = action.payload
@@ -107,6 +142,7 @@ const planetarySlice = createSlice({
 export const {
   setPlanets,
   setHouses,
+  updatePlanetaryPositions, // Added to exports
   setAscendant,
   setMoonSign,
   setSunSign,

@@ -12,6 +12,24 @@ export interface DashaPeriod {
   remedies: string[]
 }
 
+export interface SimpleDashaPeriod {
+  planet: string
+  startDate: string
+  endDate: string
+  totalYears: number
+  completedYears: number
+  remainingYears: number
+}
+
+export interface SimpleAntardashaPeriod {
+  planet: string
+  startDate: string
+  endDate: string
+  totalMonths: number
+  completedMonths: number
+  remainingMonths: number
+}
+
 export interface AntardashaPeriod {
   planet: string
   sanskritName: string
@@ -64,6 +82,35 @@ const dashaSlice = createSlice({
     setCurrentAntardasha: (state, action: PayloadAction<AntardashaPeriod>) => {
       state.currentAntardasha = action.payload
     },
+    updateCurrentDasha: (
+      state,
+      action: PayloadAction<{ mahadasha: SimpleDashaPeriod; antardasha: SimpleAntardashaPeriod }>,
+    ) => {
+      // Convert simplified format to full format
+      state.currentMahadasha = {
+        planet: action.payload.mahadasha.planet,
+        sanskritName: action.payload.mahadasha.planet, // Simplified for now
+        startDate: action.payload.mahadasha.startDate,
+        endDate: action.payload.mahadasha.endDate,
+        totalDuration: action.payload.mahadasha.totalYears,
+        remainingDuration: action.payload.mahadasha.remainingYears,
+        progressPercentage: (action.payload.mahadasha.completedYears / action.payload.mahadasha.totalYears) * 100,
+        effects: [],
+        remedies: [],
+      }
+
+      state.currentAntardasha = {
+        planet: action.payload.antardasha.planet,
+        sanskritName: action.payload.antardasha.planet, // Simplified for now
+        startDate: action.payload.antardasha.startDate,
+        endDate: action.payload.antardasha.endDate,
+        duration: action.payload.antardasha.totalMonths,
+        progressPercentage: (action.payload.antardasha.completedMonths / action.payload.antardasha.totalMonths) * 100,
+        effects: [],
+      }
+
+      state.lastCalculated = new Date().toISOString()
+    },
     setCurrentPratyantardasha: (state, action: PayloadAction<PratyantardashaPeriod>) => {
       state.currentPratyantardasha = action.payload
     },
@@ -92,6 +139,7 @@ const dashaSlice = createSlice({
 export const {
   setCurrentMahadasha,
   setCurrentAntardasha,
+  updateCurrentDasha, // Added to exports
   setCurrentPratyantardasha,
   setUpcomingDashas,
   setDashaHistory,

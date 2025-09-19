@@ -17,6 +17,15 @@ export interface UserProfile {
   lastLoginAt: string
 }
 
+export interface SimpleUserProfile {
+  name: string
+  birthDate: string
+  birthTime: string
+  birthPlace: string
+  ascendant: string
+  moonSign: string
+}
+
 interface UserState {
   profile: UserProfile | null
   isAuthenticated: boolean
@@ -40,6 +49,28 @@ const userSlice = createSlice({
       state.isAuthenticated = true
       state.error = null
     },
+    setUserProfile: (state, action: PayloadAction<SimpleUserProfile>) => {
+      // Convert simplified format to full format or create basic profile
+      const simpleProfile = action.payload
+      state.profile = {
+        id: "temp-id",
+        name: simpleProfile.name,
+        email: "",
+        dateOfBirth: simpleProfile.birthDate,
+        timeOfBirth: simpleProfile.birthTime,
+        placeOfBirth: simpleProfile.birthPlace,
+        latitude: 0,
+        longitude: 0,
+        timezone: "",
+        gender: "other",
+        isVerified: false,
+        subscriptionType: "free",
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+      }
+      state.isAuthenticated = true
+      state.error = null
+    },
     updateProfile: (state, action: PayloadAction<Partial<UserProfile>>) => {
       if (state.profile) {
         state.profile = { ...state.profile, ...action.payload }
@@ -59,5 +90,13 @@ const userSlice = createSlice({
   },
 })
 
-export const { setUser, updateProfile, setLoading, setError, logout } = userSlice.actions
+export const {
+  setUser,
+  setUserProfile, // Added to exports
+  updateProfile,
+  setLoading,
+  setError,
+  logout,
+} = userSlice.actions
+
 export default userSlice.reducer

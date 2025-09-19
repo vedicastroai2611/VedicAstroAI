@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
+import { ReduxProvider } from "@/lib/store/provider"
 import "./globals.css"
 
 const inter = Inter({
@@ -61,7 +62,9 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.jpg" />
       </head>
       <body className={`font-sans ${inter.variable} antialiased bg-black text-white min-h-screen overflow-x-hidden`}>
-        <Suspense fallback={null}>{children}</Suspense>
+        <ReduxProvider>
+          <Suspense fallback={null}>{children}</Suspense>
+        </ReduxProvider>
         <Analytics />
       </body>
     </html>
