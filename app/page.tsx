@@ -23,12 +23,12 @@ export default function HomePage() {
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/login">
-                <Button variant="ghost" className="text-foreground hover:text-primary hover:bg-primary/10">
+                <Button variant="ghost" className="text-foreground hover:text-primary hover:bg-primary/20 hover-lift">
                   Sign In
                 </Button>
               </Link>
               <Link href="/register">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 mystical-glow">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 mystical-glow hover-pop-subtle">
                   Get Started
                 </Button>
               </Link>
@@ -60,7 +60,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/10 bg-black/50 text-foreground mystical-glow w-full sm:w-auto"
+                  className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/20 hover:border-primary/60 bg-black/50 text-foreground mystical-glow hover-pop-subtle w-full sm:w-auto"
                 >
                   <Moon className="h-5 w-5 mr-2" />
                   View Demo
@@ -81,7 +81,7 @@ export default function HomePage() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              <Card className="border-primary/30 bg-black/50 hover:shadow-lg transition-all duration-300 card-glow hover:mystical-glow">
+              <Card className="border-primary/30 bg-black/50 hover:shadow-lg transition-all duration-300 card-glow hover-pop">
                 <CardHeader>
                   <div className="h-12 w-12 bg-primary/20 rounded-lg flex items-center justify-center mb-4 mystical-glow">
                     <Sun className="h-6 w-6 text-primary" />
@@ -93,7 +93,7 @@ export default function HomePage() {
                 </CardHeader>
               </Card>
 
-              <Card className="border-primary/30 bg-black/50 hover:shadow-lg transition-all duration-300 card-glow hover:mystical-glow">
+              <Card className="border-primary/30 bg-black/50 hover:shadow-lg transition-all duration-300 card-glow hover-pop">
                 <CardHeader>
                   <div className="h-12 w-12 bg-accent/20 rounded-lg flex items-center justify-center mb-4 mystical-glow">
                     <Zap className="h-6 w-6 text-accent" />
@@ -105,7 +105,7 @@ export default function HomePage() {
                 </CardHeader>
               </Card>
 
-              <Card className="border-primary/30 bg-black/50 hover:shadow-lg transition-all duration-300 card-glow hover:mystical-glow">
+              <Card className="border-primary/30 bg-black/50 hover:shadow-lg transition-all duration-300 card-glow hover-pop">
                 <CardHeader>
                   <div className="h-12 w-12 bg-primary/20 rounded-lg flex items-center justify-center mb-4 mystical-glow">
                     <Shield className="h-6 w-6 text-primary" />
@@ -129,7 +129,7 @@ export default function HomePage() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
-              <Card className="border-primary/30 bg-popover">
+              <Card className="border-primary/30 bg-popover hover-pop-subtle">
                 <CardContent className="pt-6">
                   <div className="flex mb-4">
                     {[...Array(5)].map((_, i) => (
@@ -152,7 +152,7 @@ export default function HomePage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-primary/30 bg-popover">
+              <Card className="border-primary/30 bg-popover hover-pop-subtle">
                 <CardContent className="pt-6">
                   <div className="flex mb-4">
                     {[...Array(5)].map((_, i) => (
@@ -206,16 +206,16 @@ export default function HomePage() {
                 <span className="text-xl font-bold text-foreground">Vedic Astro AI</span>
               </div>
               <div className="flex space-x-6">
-                <Link href="/login" className="text-accent hover:text-accent/80 transition-colors">
+                <Link href="/login" className="text-accent hover:text-accent/80 hover-lift transition-all">
                   Sign In
                 </Link>
-                <Link href="/register" className="text-accent hover:text-accent/80 transition-colors">
+                <Link href="/register" className="text-accent hover:text-accent/80 hover-lift transition-all">
                   Register
                 </Link>
-                <Link href="/privacy" className="text-accent hover:text-accent/80 transition-colors">
+                <Link href="/privacy" className="text-accent hover:text-accent/80 hover-lift transition-all">
                   Privacy
                 </Link>
-                <Link href="/terms" className="text-accent hover:text-accent/80 transition-colors">
+                <Link href="/terms" className="text-accent hover:text-accent/80 hover-lift transition-all">
                   Terms
                 </Link>
               </div>
