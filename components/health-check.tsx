@@ -12,8 +12,12 @@ interface HealthData {
   version: string
   environment: string
   services: Record<string, string>
-  uptime: number
-  memory: {
+  server: {
+    status: string
+    timestamp: string
+  }
+  uptime?: number
+  memory?: {
     used: number
     total: number
   }
@@ -67,11 +71,18 @@ export function HealthCheck() {
                 <strong>Environment:</strong> {healthData.environment}
               </div>
               <div>
-                <strong>Uptime:</strong> {Math.round(healthData.uptime)}s
+                <strong>Server:</strong> {healthData.server.status}
               </div>
-              <div>
-                <strong>Memory:</strong> {healthData.memory.used}MB / {healthData.memory.total}MB
-              </div>
+              {healthData.memory && (
+                <div>
+                  <strong>Memory:</strong> {healthData.memory.used}MB / {healthData.memory.total}MB
+                </div>
+              )}
+              {healthData.uptime && (
+                <div>
+                  <strong>Uptime:</strong> {Math.round(healthData.uptime)}s
+                </div>
+              )}
               <div>
                 <strong>Timestamp:</strong> {new Date(healthData.timestamp).toLocaleTimeString()}
               </div>
