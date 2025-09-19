@@ -27,7 +27,7 @@ export function MainNav() {
     <header className="border-b border-border bg-black/80 backdrop-blur-sm sticky top-0 z-50 mystical-glow">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-8">
-          <Link href="/dashboard" className="flex items-center space-x-3 group">
+          <Link href="/dashboard" className="flex items-center space-x-3 group hover-pop-subtle">
             <Moon className="h-6 w-6 text-primary group-hover:text-accent transition-colors mystical-glow" />
             <span className="text-xl font-bold text-foreground text-glow">VedicAstro AI</span>
           </Link>
@@ -40,10 +40,10 @@ export function MainNav() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`flex items-center space-x-2 px-3 py-2 transition-all duration-300 ${
+                    className={`flex items-center space-x-2 px-3 py-2 transition-all duration-300 hover-lift ${
                       isActive
                         ? "text-primary bg-primary/20 mystical-glow border border-primary/30"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent/10"
+                        : "text-muted-foreground hover:text-foreground hover:bg-primary/15"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -59,10 +59,10 @@ export function MainNav() {
             <Button
               variant="ghost"
               size="sm"
-              className={`p-2 transition-all duration-300 ${
+              className={`p-2 transition-all duration-300 hover-lift ${
                 pathname === "/settings"
                   ? "text-primary bg-primary/20 mystical-glow border border-primary/30"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-primary/15"
               }`}
             >
               <Settings className="h-4 w-4" />
@@ -70,7 +70,7 @@ export function MainNav() {
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full mystical-glow">
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full mystical-glow hover-pop-subtle">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="/woman-profile.png" />
                   <AvatarFallback className="bg-primary/20 text-primary">PS</AvatarFallback>
