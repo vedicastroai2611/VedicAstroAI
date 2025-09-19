@@ -7,14 +7,22 @@ export class ApiClient {
   }
 
   async get<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${this.baseUrl}/api${endpoint}`, {
+    const url = this.baseUrl ? `${this.baseUrl}/api${endpoint}` : `/api${endpoint}`
+
+    console.log("[v0] Making GET request to:", url)
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     })
 
+    console.log("[v0] Response status:", response.status)
+
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error("[v0] API Error response:", errorText)
       throw new Error(`API Error: ${response.status} ${response.statusText}`)
     }
 
@@ -22,7 +30,11 @@ export class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: any): Promise<T> {
-    const response = await fetch(`${this.baseUrl}/api${endpoint}`, {
+    const url = this.baseUrl ? `${this.baseUrl}/api${endpoint}` : `/api${endpoint}`
+
+    console.log("[v0] Making POST request to:", url)
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,7 +42,11 @@ export class ApiClient {
       body: data ? JSON.stringify(data) : undefined,
     })
 
+    console.log("[v0] Response status:", response.status)
+
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error("[v0] API Error response:", errorText)
       throw new Error(`API Error: ${response.status} ${response.statusText}`)
     }
 
