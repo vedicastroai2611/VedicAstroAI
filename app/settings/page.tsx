@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
+import { HealthCheck } from "@/components/health-check"
 import {
   ArrowLeft,
   User,
@@ -24,6 +25,7 @@ import {
   ChevronRight,
   Edit,
   Palette,
+  Server,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -137,6 +139,22 @@ export default function SettingsPage() {
                   </Button>
                 </Link>
                 <div className="text-sm text-muted-foreground">Current: Asia/Kolkata</div>
+              </CardContent>
+            </Card>
+
+            {/* Server Health */}
+            <Card className="border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center text-foreground">
+                  <Server className="h-5 w-5 mr-2 text-green-500" />
+                  Server Health
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">Monitor backend API status and server performance</p>
+                  <HealthCheck />
+                </div>
               </CardContent>
             </Card>
           </div>
