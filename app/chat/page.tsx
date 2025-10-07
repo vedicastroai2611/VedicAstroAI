@@ -49,23 +49,27 @@ export default function ChatPage() {
     <AppLayout>
       <div className="min-h-screen bg-background flex flex-col">
         {/* Header */}
-        <header className="border-b border-border bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-sm">
-          <div className="container mx-auto px-4 py-4">
+        <header className="border-b border-primary/30 bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 backdrop-blur-sm relative overflow-hidden">
+          {/* Mystical background elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/5 rounded-full blur-2xl"></div>
+          
+          <div className="container mx-auto px-4 py-4 relative z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center">
-                  <Sparkles className="h-5 w-5 text-primary-foreground" />
+                <div className="h-10 w-10 bg-primary/20 rounded-full flex items-center justify-center mystical-glow float-animation">
+                  <Sparkles className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-foreground">VedicAstro AI</h1>
+                  <h1 className="text-xl font-bold text-foreground text-glow">VedicAstro AI</h1>
                   <p className="text-sm text-muted-foreground">Your Spiritual Guide</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hover-lift">
                   <Bookmark className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hover-lift">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </div>
@@ -74,10 +78,10 @@ export default function ChatPage() {
         </header>
 
         {/* Quick Suggestions */}
-        <div className="border-b border-border bg-card/30 p-4">
+        <div className="border-b border-primary/30 bg-card/30 backdrop-blur-sm p-4">
           <div className="container mx-auto">
             <div className="flex items-center space-x-2 mb-3">
-              <Star className="h-4 w-4 text-accent" />
+              <Star className="h-4 w-4 text-accent mystical-glow" />
               <span className="text-sm font-medium text-foreground">Ask me about:</span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -85,7 +89,8 @@ export default function ChatPage() {
                 <Badge
                   key={index}
                   variant="secondary"
-                  className="cursor-pointer hover:bg-purple-500/20 bg-purple-500/10 text-purple-300 border-purple-500/30 transition-colors"
+                  className="cursor-pointer hover:bg-primary/20 bg-primary/10 text-primary border-primary/30 transition-all duration-300 hover-lift mystical-border"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {suggestion}
                 </Badge>
@@ -117,8 +122,10 @@ export default function ChatPage() {
                     </Avatar>
                     <div className={`flex flex-col ${msg.type === "user" ? "items-end" : "items-start"}`}>
                       <Card
-                        className={`border-border ${
-                          msg.type === "user" ? "bg-primary text-primary-foreground" : "bg-card"
+                        className={`border-primary/30 backdrop-blur-sm card-mystical ${
+                          msg.type === "user" 
+                            ? "bg-primary text-primary-foreground mystical-glow" 
+                            : "bg-card/50"
                         }`}
                       >
                         <CardContent className="p-4">
@@ -176,15 +183,18 @@ export default function ChatPage() {
         </div>
 
         {/* Message Input */}
-        <div className="border-t border-border bg-card/50 backdrop-blur-sm p-4">
-          <div className="container mx-auto max-w-4xl">
+        <div className="border-t border-primary/30 bg-card/50 backdrop-blur-sm p-4 relative overflow-hidden">
+          {/* Mystical background elements */}
+          <div className="absolute top-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
+          
+          <div className="container mx-auto max-w-4xl relative z-10">
             <div className="flex space-x-4">
               <div className="flex-1">
                 <Input
                   placeholder="Ask about your astrological insights..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="bg-background border-border"
+                  className="bg-background border-primary/30 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 hover-lift"
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
                       // Handle send message
@@ -195,7 +205,7 @@ export default function ChatPage() {
               </div>
               <Button
                 size="sm"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 mystical-glow btn-mystical"
                 disabled={!message.trim()}
               >
                 <Send className="h-4 w-4" />

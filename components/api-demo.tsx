@@ -1,0 +1,319 @@
+"use client"
+
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Loader2, Star, Moon, Database, Zap } from 'lucide-react'
+import { toast } from 'sonner'
+
+interface ApiTestResult {
+  success: boolean
+  data?: any
+  source?: 'api' | 'mock'
+  api_used?: string
+  error?: string
+  timestamp?: string
+  input_parameters?: any
+}
+
+export function ApiDemo() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [result, setResult] = useState<ApiTestResult | null>(null)
+  const [horaryNumber, setHoraryNumber] = useState('108')
+  const [testData, setTestData] = useState({
+    year: '1990',
+    month: '4',
+    day: '15',
+    hour: '14',
+    minute: '30',
+    second: '0',
+    latitude: '28.6139',
+    longitude: '77.2090',
+    utc: '+05:30',
+    ayanamsa: 'Lahiri',
+    house_system: 'Equal'
+  })
+
+  const isRealApiEnabled = process.env.NEXT_PUBLIC_ENABLE_REAL_API === 'true'
+
+  const testHoroscopeApi = async () => {
+    setIsLoading(true)
+    setResult(null)
+    
+    try {
+      console.log('🧪 Testing Horoscope API...', testData)
+      
+      const response = await fetch('/api/horoscope', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          year: parseInt(testData.year),
+          month: parseInt(testData.month),
+          day: parseInt(testData.day),
+          hour: parseInt(testData.hour),
+          minute: parseInt(testData.minute),
+          second: parseInt(testData.second),
+          latitude: parseFloat(testData.latitude),
+          longitude: parseFloat(testData.longitude),
+          utc: testData.utc,
+          ayanamsa: testData.ayanamsa,
+          house_system: testData.house_system
+        })
+      })
+      
+      const data = await response.json()
+      setResult(data)
+      
+      if (data.success) {
+        toast.success(`Horoscope generated successfully using ${data.api_used}`)
+      } else {
+        toast.error(`API test failed: ${data.error}`)
+      }
+      
+    } catch (error) {
+      console.error('Test failed:', error)
+      setResult({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+      toast.error('Test failed')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const testHoraryApi = async () => {
+    setIsLoading(true)
+    setResult(null)
+    
+    try {
+      console.log('🧪 Testing Horary API...', { horary_number: horaryNumber, ...testData })
+      
+      const response = await fetch('/api/horary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          horary_number: parseInt(horaryNumber),
+          year: parseInt(testData.year),
+          month: parseInt(testData.month),
+          day: parseInt(testData.day),
+          hour: parseInt(testData.hour),
+          minute: parseInt(testData.minute),
+          second: parseInt(testData.second),
+          latitude: parseFloat(testData.latitude),
+          longitude: parseFloat(testData.longitude),
+          utc: testData.utc,
+          ayanamsa: 'Krishnamurti',
+          house_system: 'Placidus'
+        })
+      })
+      
+      const data = await response.json()
+      setResult(data)
+      
+      if (data.success) {
+        toast.success(`Horary reading generated successfully using ${data.api_used}`)
+      } else {
+        toast.error(`Horary API test failed: ${data.error}`)
+      }
+      
+    } catch (error) {
+      console.error('Horary test failed:', error)
+      setResult({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+      toast.error('Horary test failed')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const getExampleUrl = (type: 'horoscope' | 'horary') => {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001'
+    if (type === 'horoscope') {
+      return `${baseUrl}/api/horoscope?year=1990&month=4&day=15&hour=14&minute=30&latitude=28.6139&longitude=77.2090&ayanamsa=Lahiri&house_system=Equal`
+    } else {
+      return `${baseUrl}/api/horary?number=108&year=2024&month=10&day=4&hour=14&minute=30&latitude=28.6139&longitude=77.2090`
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card className="border-primary/30 bg-card/50 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Database className="h-5 w-5 text-primary" />
+            <span>VedicAstro FastAPI Integration Test</span>
+            <Badge variant={isRealApiEnabled ? 'default' : 'secondary'} className="ml-2">
+              {isRealApiEnabled ? '🌐 Real API Enabled' : '🔧 Mock Data Mode'}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {!isRealApiEnabled && (
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+              <div className="flex items-center space-x-2">
+                <Zap className="h-4 w-4 text-blue-400" />
+                <span className="text-blue-400 font-medium">Demo Mode Active</span>
+              </div>
+              <p className="text-sm text-blue-300 mt-1">
+                Currently using mock data. To enable real FastAPI calls, set <code>NEXT_PUBLIC_ENABLE_REAL_API=true</code> in .env.local
+              </p>
+            </div>
+          )}
+
+          {/* Test Parameters */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="year">Year</Label>
+              <Input
+                id="year"
+                value={testData.year}
+                onChange={(e) => setTestData({...testData, year: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="month">Month</Label>
+              <Input
+                id="month"
+                value={testData.month}
+                onChange={(e) => setTestData({...testData, month: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="day">Day</Label>
+              <Input
+                id="day"
+                value={testData.day}
+                onChange={(e) => setTestData({...testData, day: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="hour">Hour</Label>
+              <Input
+                id="hour"
+                value={testData.hour}
+                onChange={(e) => setTestData({...testData, hour: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="latitude">Latitude</Label>
+              <Input
+                id="latitude"
+                value={testData.latitude}
+                onChange={(e) => setTestData({...testData, latitude: e.target.value})}
+                placeholder="28.6139 (New Delhi)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="longitude">Longitude</Label>
+              <Input
+                id="longitude"
+                value={testData.longitude}
+                onChange={(e) => setTestData({...testData, longitude: e.target.value})}
+                placeholder="77.2090 (New Delhi)"
+              />
+            </div>
+          </div>
+
+          {/* API Test Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button
+              onClick={testHoroscopeApi}
+              disabled={isLoading}
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Star className="h-4 w-4 mr-2" />
+              )}
+              Test Horoscope API
+            </Button>
+
+            <div className="flex items-center space-x-2 flex-1">
+              <Input
+                value={horaryNumber}
+                onChange={(e) => setHoraryNumber(e.target.value)}
+                placeholder="Horary Number (1-249)"
+                className="w-32"
+              />
+              <Button
+                onClick={testHoraryApi}
+                disabled={isLoading}
+                variant="outline"
+                className="flex-1"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Moon className="h-4 w-4 mr-2" />
+                )}
+                Test Horary API
+              </Button>
+            </div>
+          </div>
+
+          {/* API URLs for direct testing */}
+          <div className="space-y-2">
+            <Label>Direct API URLs for testing:</Label>
+            <div className="space-y-1 text-sm">
+              <code className="block p-2 bg-muted rounded text-xs break-all">
+                {getExampleUrl('horoscope')}
+              </code>
+              <code className="block p-2 bg-muted rounded text-xs break-all">
+                {getExampleUrl('horary')}
+              </code>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Results Display */}
+      {result && (
+        <Card className="border-primary/30 bg-card/50 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              {result.success ? (
+                <Badge className="bg-green-500/20 text-green-400 border-green-500/20">
+                  ✅ Success
+                </Badge>
+              ) : (
+                <Badge className="bg-red-500/20 text-red-400 border-red-500/20">
+                  ❌ Failed
+                </Badge>
+              )}
+              {result.api_used && (
+                <Badge variant="outline" className="ml-2">
+                  {result.api_used}
+                </Badge>
+              )}
+              {result.source && (
+                <Badge variant={result.source === 'api' ? 'default' : 'secondary'}>
+                  {result.source === 'api' ? '🌐 API' : '🔧 Mock'}
+                </Badge>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <pre className="text-xs bg-muted p-4 rounded overflow-auto max-h-96">
+              {JSON.stringify(result, null, 2)}
+            </pre>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}

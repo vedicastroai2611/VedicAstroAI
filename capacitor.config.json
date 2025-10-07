@@ -1,7 +1,7 @@
 {
   "appId": "com.vedicastroai.app",
   "appName": "Vedic Astro AI",
-  "webDir": "out",
+  "webDir": "public",
   "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https"

@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
-import { AppLayout } from "@/components/app-layout"
 import {
   Star,
   Moon,
@@ -25,23 +24,275 @@ import {
   Activity,
 } from "lucide-react"
 import Link from "next/link"
+import { useAppSelector, useAppDispatch } from "@/lib/hooks/useRedux"
+import React, { useEffect, ReactNode } from "react"
+import { updatePlanetaryPositions } from "@/lib/store/slices/planetarySlice"
+import { updateCurrentDasha } from "@/lib/store/slices/dashaSlice"
+import { MainNav } from "@/components/main-nav"
+import { setUserProfile } from "@/lib/store/slices/userSlice"
 
 export default function DashboardPage() {
+  const dispatch = useAppDispatch()
+  const { profile } = useAppSelector((state) => state.user)
+  const { planets } = useAppSelector((state) => state.planetary)
+  const dasha = useAppSelector((state) => state.dasha)
+  const mahadasha = dasha.mahadasha
+  const antardasha = dasha.antardasha
+
+  // Set up refresh interval for real-time data
+  const [refreshInterval, setRefreshInterval] = React.useState(60000); // Default: 1 minute
+  const [lastRefreshed, setLastRefreshed] = React.useState(new Date());
+
+  // Fetch planetary positions from API with real-time data
+  const fetchPlanetaryPositions = async () => {
+    try {
+      // Use current timestamp to ensure we get real-time data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/planets?timestamp=${timestamp}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch planetary positions');
+      }
+      const data = await response.json();
+      
+      // Update the store with real-time planetary data
+      if (data && data.planets && Array.isArray(data.planets)) {
+        dispatch(updatePlanetaryPositions(data.planets));
+        setLastRefreshed(new Date());
+      } else {
+        throw new Error('Invalid planetary data format');
+      }
+    } catch (error) {
+      console.error('Error fetching planetary positions:', error);
+      // Fallback to default data if API fails
+      dispatch(
+        updatePlanetaryPositions([
+          {
+            id: "sun",
+            name: "Sun",
+            sign: "Aries",
+            degree: 15.5,
+            isRetrograde: false,
+            house: 10,
+            aspectingPlanets: ["Jupiter", "Saturn"],
+          },
+          {
+            id: "moon",
+            name: "Moon",
+            sign: "Cancer",
+            degree: 8.2,
+            isRetrograde: false,
+            house: 1,
+            aspectingPlanets: ["Mars"],
+          },
+          {
+            id: "mars",
+            name: "Mars",
+            sign: "Capricorn",
+            degree: 22.7,
+            isRetrograde: false,
+            house: 7,
+            aspectingPlanets: ["Venus", "Mercury"],
+          },
+          {
+            id: "mercury",
+            name: "Mercury",
+            sign: "Pisces",
+            degree: 3.1,
+            isRetrograde: true,
+            house: 9,
+            aspectingPlanets: ["Jupiter"],
+          },
+          {
+            id: "jupiter",
+            name: "Jupiter",
+            sign: "Sagittarius",
+            degree: 17.9,
+            isRetrograde: false,
+            house: 6,
+            aspectingPlanets: ["Sun", "Mercury"],
+          },
+          {
+            id: "venus",
+            name: "Venus",
+            sign: "Taurus",
+            degree: 5.4,
+            isRetrograde: false,
+            house: 11,
+            aspectingPlanets: ["Mars"],
+          },
+          {
+            id: "saturn",
+            name: "Saturn",
+            sign: "Libra",
+            degree: 29.8,
+            isRetrograde: true,
+            house: 4,
+            aspectingPlanets: ["Sun"],
+          },
+          {
+            id: "rahu",
+            name: "Rahu",
+            sign: "Gemini",
+            degree: 12.3,
+            isRetrograde: false,
+            house: 12,
+            aspectingPlanets: [],
+          },
+          {
+            id: "ketu",
+            name: "Ketu",
+            sign: "Sagittarius",
+            degree: 12.3,
+            isRetrograde: false,
+            house: 6,
+            aspectingPlanets: [],
+          },
+        ])
+      );
+    }
+  };
+
+  useEffect(() => {
+    // Fetch user profile
+    dispatch(
+      setUserProfile({
+        id: "user-1",
+        name: "Arjun Sharma",
+        email: "arjun@example.com",
+        birthDate: "1985-04-12T14:30:00Z",
+        birthPlace: "New Delhi, India",
+        profileImage: "/avatars/arjun.jpg",
+      })
+    );
+    
+    // Initial fetch
+    fetchPlanetaryPositions();
+
+    // Set up interval for periodic refreshes
+    const refreshTimer = setInterval(() => {
+      fetchPlanetaryPositions();
+    }, refreshInterval);
+
+    // Clean up interval on component unmount
+    return () => {
+      clearInterval(refreshTimer);
+    };
+  }, [dispatch, refreshInterval]);
+  
+  // Helper function to get planet icon
+  const getPlanetIcon = (planetId: string): ReactNode => {
+    switch (planetId.toLowerCase()) {
+      case "sun":
+        return <Sun className="h-7 w-7 text-yellow-500" />
+      case "moon":
+        return <Moon className="h-7 w-7 text-blue-500" />
+      case "mars":
+        return (
+          <div className="h-7 w-7 bg-red-500 rounded-full flex items-center justify-center">
+            <span className="text-sm text-white font-bold">♂</span>
+          </div>
+        )
+      case "mercury":
+        return (
+          <div className="h-7 w-7 bg-green-500 rounded-full flex items-center justify-center">
+            <span className="text-sm text-white font-bold">☿</span>
+          </div>
+        )
+      case "jupiter":
+        return (
+          <div className="h-7 w-7 bg-yellow-500 rounded-full flex items-center justify-center">
+            <span className="text-sm text-white font-bold">♃</span>
+          </div>
+        )
+      case "venus":
+        return (
+          <div className="h-7 w-7 bg-pink-500 rounded-full flex items-center justify-center">
+            <span className="text-sm text-white font-bold">♀</span>
+          </div>
+        )
+      case "saturn":
+        return (
+          <div className="h-7 w-7 bg-gray-500 rounded-full flex items-center justify-center">
+            <span className="text-sm text-white font-bold">♄</span>
+          </div>
+        )
+      case "rahu":
+        return (
+          <div className="h-7 w-7 bg-purple-500/80 rounded-full flex items-center justify-center">
+            <span className="text-sm text-white font-bold">☊</span>
+          </div>
+        )
+      case "ketu":
+        return (
+          <div className="h-7 w-7 bg-teal-500/80 rounded-full flex items-center justify-center">
+            <span className="text-sm text-white font-bold">☋</span>
+          </div>
+        )
+      default:
+        return <Star className="h-7 w-7 text-gray-500" />
+    }
+  }
+
+  // Add useEffect for initial data fetching and interval setup
+  React.useEffect(() => {
+    // Initial fetch
+    fetchPlanetaryPositions();
+
+    // Set up interval for periodic refreshes
+    const refreshTimer = setInterval(() => {
+      fetchPlanetaryPositions();
+    }, refreshInterval);
+
+    // Simulate fetching dasha periods
+    dispatch(
+      updateCurrentDasha({
+        mahadasha: {
+          planet: "Jupiter",
+          startDate: "2019-06-15",
+          endDate: "2035-06-15",
+          totalYears: 16,
+          completedYears: 4,
+          remainingYears: 12,
+        },
+        antardasha: {
+          planet: "Venus",
+          startDate: "2023-09-01",
+          endDate: "2025-03-01",
+          totalMonths: 14,
+          completedMonths: 10,
+          remainingMonths: 4
+        },
+      })
+    );
+
+    // Clean up interval on component unmount
+    return () => {
+      clearInterval(refreshTimer);
+    };
+  }, [dispatch, refreshInterval])
+
+  
+
   return (
-    <AppLayout>
+    <div className="min-h-screen bg-background">
+      <MainNav />
       <div className="min-h-screen bg-background">
         <div className="border-b border-border bg-gradient-to-r from-background to-muted/20">
           <div className="container mx-auto px-6 py-8 max-w-7xl">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back, Priya</h1>
+                <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back, {profile?.name || "User"}</h1>
                 <p className="text-muted-foreground">Your cosmic journey continues today</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Today's Energy</p>
                 <div className="flex items-center space-x-2 mt-1">
-                  <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-foreground">Highly Favorable</span>
+                  <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
+                    Positive
+                  </Badge>
+                  <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+                    Creative
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -49,308 +300,281 @@ export default function DashboardPage() {
         </div>
 
         <div className="container mx-auto px-6 py-8 max-w-7xl">
-          <div className="grid lg:grid-cols-4 gap-8">
-            {/* Left Column - Profile & Current Period */}
-            <div className="lg:col-span-1 space-y-6">
-              {/* Profile Card */}
-              <Card className="border-border bg-gradient-to-br from-primary/5 to-accent/5">
-                <CardContent className="pt-6 text-center">
-                  <div className="relative inline-block mb-4">
-                    <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-                      <AvatarImage src="/woman-profile.png" />
-                      <AvatarFallback className="text-2xl">PS</AvatarFallback>
-                    </Avatar>
-                    <div className="absolute -top-1 -right-1 h-7 w-7 bg-accent rounded-full flex items-center justify-center shadow-lg">
-                      <Star className="h-4 w-4 text-accent-foreground" />
-                    </div>
-                  </div>
-                  <h2 className="text-2xl font-bold text-foreground mb-2">Priya Sharma</h2>
-                  <p className="text-muted-foreground mb-3">Born: 15 Aug 1990, 14:30, Mumbai</p>
-                  <div className="flex flex-col space-y-2">
-                    <Badge variant="secondary" className="justify-center">
-                      Virgo Ascendant
-                    </Badge>
-                    <Badge variant="secondary" className="justify-center">
-                      Moon in Cancer
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 space-y-6">
               {/* Current Dasha Period */}
               <Card className="border-border">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center text-foreground text-lg">
-                    <Clock className="h-5 w-5 mr-2 text-accent" />
-                    Current Dasha Period
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-accent text-lg">Venus Mahadasha</span>
-                      <span className="text-sm text-muted-foreground">2019 - 2039</span>
-                    </div>
-                    <Progress value={35} className="h-3" />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>7 years completed</span>
-                      <span>13 years remaining</span>
-                    </div>
-                  </div>
-                  <div className="pt-3 border-t border-border">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-foreground">Mercury Antardasha</span>
-                      <span className="text-xs text-muted-foreground">Till Mar 2025</span>
-                    </div>
-                    <Progress value={75} className="h-2" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-border">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center text-foreground text-lg">
-                    <Zap className="h-5 w-5 mr-2 text-accent" />
-                    Today's Lucky Elements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="text-center p-3 rounded-lg bg-green-500/10">
-                      <p className="text-xs text-muted-foreground mb-1">Color</p>
-                      <p className="font-semibold text-foreground">Green</p>
-                    </div>
-                    <div className="text-center p-3 rounded-lg bg-blue-500/10">
-                      <p className="text-xs text-muted-foreground mb-1">Number</p>
-                      <p className="font-semibold text-foreground">7</p>
-                    </div>
-                    <div className="text-center p-3 rounded-lg bg-purple-500/10">
-                      <p className="text-xs text-muted-foreground mb-1">Direction</p>
-                      <p className="font-semibold text-foreground">North</p>
-                    </div>
-                    <div className="text-center p-3 rounded-lg bg-orange-500/10">
-                      <p className="text-xs text-muted-foreground mb-1">Time</p>
-                      <p className="font-semibold text-foreground">2-4 PM</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Middle Column - Planetary Positions & Houses */}
-            <div className="lg:col-span-2 space-y-6">
-              <Card className="border-border">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center text-foreground text-lg">
-                    <Sun className="h-5 w-5 mr-2 text-accent" />
-                    Current Planetary Positions
-                  </CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-foreground text-lg">Current Dasha Period</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    <div className="flex items-center space-x-3 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                      <Sun className="h-7 w-7 text-yellow-500" />
-                      <div>
-                        <p className="font-semibold text-foreground">Sun</p>
-                        <p className="text-sm text-muted-foreground">Leo 23°</p>
-                        <p className="text-xs text-muted-foreground">12th House</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Mahadasha */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          {mahadasha && getPlanetIcon(mahadasha.planet)}
+                          <div>
+                            <p className="font-medium text-foreground">{mahadasha?.planet} Mahadasha</p>
+                            <p className="text-xs text-muted-foreground">
+                              {mahadasha?.startDate} to {mahadasha?.endDate}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                          {mahadasha?.totalYears} Years
+                        </Badge>
+                      </div>
+                      <Progress value={(mahadasha?.completedYears / mahadasha?.totalYears) * 100} className="h-2" />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>
+                          {mahadasha?.completedYears} year{mahadasha?.completedYears !== 1 ? "s" : ""} completed
+                        </span>
+                        <span>
+                          {mahadasha?.remainingYears} year{mahadasha?.remainingYears !== 1 ? "s" : ""} remaining
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                      <Moon className="h-7 w-7 text-blue-500" />
-                      <div>
-                        <p className="font-semibold text-foreground">Moon</p>
-                        <p className="text-sm text-muted-foreground">Cancer 7°</p>
-                        <p className="text-xs text-muted-foreground">11th House</p>
+
+                    {/* Antardasha */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          {antardasha && getPlanetIcon(antardasha.planet)}
+                          <div>
+                            <p className="font-medium text-foreground">{antardasha?.planet} Antardasha</p>
+                            <p className="text-xs text-muted-foreground">
+                              {antardasha?.startDate} to {antardasha?.endDate}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
+                          {antardasha?.totalMonths} Months
+                        </Badge>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                      <div className="h-7 w-7 bg-red-500 rounded-full flex items-center justify-center">
-                        <span className="text-sm text-white font-bold">♂</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">Mars</p>
-                        <p className="text-sm text-muted-foreground">Aries 15°</p>
-                        <p className="text-xs text-muted-foreground">8th House</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                      <div className="h-7 w-7 bg-green-500 rounded-full flex items-center justify-center">
-                        <span className="text-sm text-white font-bold">☿</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">Mercury</p>
-                        <p className="text-sm text-muted-foreground">Virgo 2°</p>
-                        <p className="text-xs text-muted-foreground">1st House</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-4 rounded-lg bg-pink-500/10 border border-pink-500/20">
-                      <div className="h-7 w-7 bg-pink-500 rounded-full flex items-center justify-center">
-                        <span className="text-sm text-white font-bold">♀</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">Venus</p>
-                        <p className="text-sm text-muted-foreground">Libra 18°</p>
-                        <p className="text-xs text-muted-foreground">2nd House</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                      <div className="h-7 w-7 bg-orange-500 rounded-full flex items-center justify-center">
-                        <span className="text-sm text-white font-bold">♃</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">Jupiter</p>
-                        <p className="text-sm text-muted-foreground">Taurus 9°</p>
-                        <p className="text-xs text-muted-foreground">9th House</p>
+                      <Progress value={(antardasha?.completedMonths / antardasha?.totalMonths) * 100} className="h-2" />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>
+                          {antardasha?.completedMonths} month{antardasha?.completedMonths !== 1 ? "s" : ""} completed
+                        </span>
+                        <span>
+                          {antardasha?.remainingMonths} month{antardasha?.remainingMonths !== 1 ? "s" : ""} remaining
+                        </span>
                       </div>
                     </div>
                   </div>
-                  <Link href="/planets">
-                    <Button variant="outline" className="w-full bg-transparent">
-                      View Complete Planetary Analysis
-                    </Button>
-                  </Link>
                 </CardContent>
               </Card>
 
+              {/* Planetary Positions */}
               <Card className="border-border">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center text-foreground text-lg">
-                    <div className="h-5 w-5 mr-2 bg-primary rounded flex items-center justify-center">
-                      <span className="text-xs text-primary-foreground font-bold">#</span>
-                    </div>
-                    Birth Chart Houses
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-4 gap-3 mb-6">
-                    {[
-                      { house: "1st", sign: "Virgo", lord: "Mercury", strength: "Strong" },
-                      { house: "2nd", sign: "Libra", lord: "Venus", strength: "Good" },
-                      { house: "3rd", sign: "Scorpio", lord: "Mars", strength: "Moderate" },
-                      { house: "4th", sign: "Sagittarius", lord: "Jupiter", strength: "Strong" },
-                      { house: "5th", sign: "Capricorn", lord: "Saturn", strength: "Weak" },
-                      { house: "6th", sign: "Aquarius", lord: "Saturn", strength: "Good" },
-                      { house: "7th", sign: "Pisces", lord: "Jupiter", strength: "Strong" },
-                      { house: "8th", sign: "Aries", lord: "Mars", strength: "Moderate" },
-                      { house: "9th", sign: "Taurus", lord: "Venus", strength: "Excellent" },
-                      { house: "10th", sign: "Gemini", lord: "Mercury", strength: "Good" },
-                      { house: "11th", sign: "Cancer", lord: "Moon", strength: "Strong" },
-                      { house: "12th", sign: "Leo", lord: "Sun", strength: "Moderate" },
-                    ].map((item, index) => (
-                      <div
-                        key={index}
-                        className="text-center p-3 rounded-lg bg-muted/30 border border-border hover:bg-muted/50 transition-colors"
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-foreground text-lg">Current Planetary Positions</CardTitle>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs text-muted-foreground">
+                        Last updated: {lastRefreshed.toLocaleTimeString()}
+                      </span>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => fetchPlanetaryPositions()}
+                        className="h-8 w-8 p-0"
                       >
-                        <p className="text-xs text-muted-foreground mb-1">{item.house} House</p>
-                        <p className="font-semibold text-foreground text-sm">{item.sign}</p>
-                        <p className="text-xs text-muted-foreground">{item.lord}</p>
-                        <div
-                          className={`text-xs px-2 py-1 rounded mt-1 ${
-                            item.strength === "Excellent"
-                              ? "bg-green-500/20 text-green-600"
-                              : item.strength === "Strong"
-                                ? "bg-blue-500/20 text-blue-600"
-                                : item.strength === "Good"
-                                  ? "bg-yellow-500/20 text-yellow-600"
-                                  : item.strength === "Moderate"
-                                    ? "bg-orange-500/20 text-orange-600"
-                                    : "bg-red-500/20 text-red-600"
-                          }`}
-                        >
-                          {item.strength}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+                        <span className="sr-only">Refresh</span>
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {planets.map((planet) => (
+                      <div key={planet.id} className="flex items-start space-x-3 p-3 rounded-lg border border-border">
+                        <div className="mt-1">{getPlanetIcon(planet.name)}</div>
+                        <div>
+                          <p className="font-medium text-foreground">{planet.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {planet.sign} {planet.degree.toFixed(1)}°
+                          </p>
+                          <div className="flex items-center mt-1">
+                            <Badge
+                              variant="outline"
+                              className="text-xs bg-secondary/10 text-secondary border-secondary/20"
+                            >
+                              House {planet.house}
+                            </Badge>
+                            {planet.isRetrograde && (
+                              <Badge
+                                variant="outline"
+                                className="ml-1 text-xs bg-destructive/10 text-destructive border-destructive/20"
+                              >
+                                R
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                  <Link href="/houses">
-                    <Button variant="outline" className="w-full bg-transparent">
-                      View Interactive Birth Chart
-                    </Button>
-                  </Link>
+                </CardContent>
+              </Card>
+
+              {/* Life Areas */}
+              <Card className="border-border">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-foreground text-lg">Life Areas Forecast</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="flex flex-col items-center p-4 rounded-lg border border-border text-center">
+                      <Heart className="h-8 w-8 text-pink-500 mb-2" />
+                      <h3 className="font-medium text-foreground">Relationships</h3>
+                      <div className="flex items-center mt-2 space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-pink-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-pink-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-pink-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Favorable connections</p>
+                    </div>
+
+                    <div className="flex flex-col items-center p-4 rounded-lg border border-border text-center">
+                      <Briefcase className="h-8 w-8 text-blue-500 mb-2" />
+                      <h3 className="font-medium text-foreground">Career</h3>
+                      <div className="flex items-center mt-2 space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Growth opportunities</p>
+                    </div>
+
+                    <div className="flex flex-col items-center p-4 rounded-lg border border-border text-center">
+                      <Brain className="h-8 w-8 text-purple-500 mb-2" />
+                      <h3 className="font-medium text-foreground">Mental Health</h3>
+                      <div className="flex items-center mt-2 space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Needs attention</p>
+                    </div>
+
+                    <div className="flex flex-col items-center p-4 rounded-lg border border-border text-center">
+                      <Activity className="h-8 w-8 text-green-500 mb-2" />
+                      <h3 className="font-medium text-foreground">Health</h3>
+                      <div className="flex items-center mt-2 space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Stable energy</p>
+                    </div>
+
+                    <div className="flex flex-col items-center p-4 rounded-lg border border-border text-center">
+                      <TrendingUp className="h-8 w-8 text-amber-500 mb-2" />
+                      <h3 className="font-medium text-foreground">Finances</h3>
+                      <div className="flex items-center mt-2 space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Excellent prospects</p>
+                    </div>
+
+                    <div className="flex flex-col items-center p-4 rounded-lg border border-border text-center">
+                      <Target className="h-8 w-8 text-red-500 mb-2" />
+                      <h3 className="font-medium text-foreground">Goals</h3>
+                      <div className="flex items-center mt-2 space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted"></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Good progress</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Right Column - Key Insights & Actions */}
-            <div className="lg:col-span-1 space-y-6">
+            <div className="space-y-6">
+              {/* Profile Card */}
               <Card className="border-border">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center text-foreground text-lg">
-                    <TrendingUp className="h-5 w-5 mr-2 text-accent" />
-                    Today's Insights
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Career Focus */}
-                  <div className="p-4 rounded-lg bg-gradient-to-r from-accent/10 to-accent/5 border-l-4 border-accent">
-                    <div className="flex items-start space-x-3">
-                      <Briefcase className="h-5 w-5 text-accent mt-0.5" />
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-foreground mb-1">Career Focus</h4>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Venus Mahadasha brings opportunities in creative fields and partnerships
-                        </p>
-                        <div className="flex items-center space-x-1">
-                          <Activity className="h-3 w-3 text-accent" />
-                          <span className="text-xs text-accent font-medium">85% Favorable</span>
-                        </div>
-                      </div>
+                <CardContent className="pt-6">
+                  <div className="flex flex-col items-center text-center">
+                    <Avatar className="h-20 w-20 mb-4">
+                      <AvatarImage src={profile?.profileImage} alt={profile?.name} />
+                      <AvatarFallback>{profile?.name?.charAt(0) || "U"}</AvatarFallback>
+                    </Avatar>
+                    <h3 className="text-lg font-medium text-foreground">{profile?.name || "User"}</h3>
+                    <p className="text-sm text-muted-foreground">{profile?.email}</p>
+                    <div className="flex items-center mt-2 space-x-1">
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                        Taurus Ascendant
+                      </Badge>
+                      <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20">
+                        Moon in Cancer
+                      </Badge>
                     </div>
-                  </div>
-
-                  {/* Relationships */}
-                  <div className="p-4 rounded-lg bg-gradient-to-r from-primary/10 to-primary/5 border-l-4 border-primary">
-                    <div className="flex items-start space-x-3">
-                      <Heart className="h-5 w-5 text-primary mt-0.5" />
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-foreground mb-1">Relationships</h4>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Strong Moon in 11th house indicates supportive friendships
-                        </p>
-                        <div className="flex items-center space-x-1">
-                          <Activity className="h-3 w-3 text-primary" />
-                          <span className="text-xs text-primary font-medium">92% Positive</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Health */}
-                  <div className="p-4 rounded-lg bg-gradient-to-r from-green-500/10 to-green-500/5 border-l-4 border-green-500">
-                    <div className="flex items-start space-x-3">
-                      <Brain className="h-5 w-5 text-green-500 mt-0.5" />
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-foreground mb-1">Health & Wellness</h4>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Mercury in ascendant promotes mental clarity and communication
-                        </p>
-                        <div className="flex items-center space-x-1">
-                          <Activity className="h-3 w-3 text-green-500" />
-                          <span className="text-xs text-green-500 font-medium">78% Stable</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-gradient-to-r from-yellow-500/10 to-yellow-500/5 border-l-4 border-yellow-500">
-                    <div className="flex items-start space-x-3">
-                      <Target className="h-5 w-5 text-yellow-500 mt-0.5" />
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-foreground mb-1">Finance</h4>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Jupiter in 9th house suggests growth through investments
-                        </p>
-                        <div className="flex items-center space-x-1">
-                          <Activity className="h-3 w-3 text-yellow-500" />
-                          <span className="text-xs text-yellow-500 font-medium">70% Growth</span>
-                        </div>
-                      </div>
+                    <div className="w-full mt-4">
+                      <Button variant="outline" className="w-full">
+                        View Full Chart
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
+              {/* Energy Levels */}
+              <Card className="border-border">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-foreground text-lg">Energy Levels</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Physical</span>
+                      <span className="text-foreground font-medium">78%</span>
+                    </div>
+                    <Progress value={78} className="h-2" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Mental</span>
+                      <span className="text-foreground font-medium">65%</span>
+                    </div>
+                    <Progress value={65} className="h-2" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Emotional</span>
+                      <span className="text-foreground font-medium">82%</span>
+                    </div>
+                    <Progress value={82} className="h-2" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Spiritual</span>
+                      <span className="text-foreground font-medium">91%</span>
+                    </div>
+                    <Progress value={91} className="h-2" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Actions */}
               <Card className="border-border">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-foreground text-lg">Quick Actions</CardTitle>
@@ -395,6 +619,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
+              {/* Spiritual Guidance */}
               <Card className="border-border bg-gradient-to-br from-purple-500/5 to-blue-500/5">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center text-foreground text-lg">
@@ -414,7 +639,7 @@ export default function DashboardPage() {
                         style={{ animationDelay: "0.2s" }}
                       ></div>
                       <div
-                        className="h-2 w-2 bg-accent rounded-full animate-pulse"
+                        className="h-2 w-2 bg-pink-500 rounded-full animate-pulse"
                         style={{ animationDelay: "0.4s" }}
                       ></div>
                     </div>
@@ -425,6 +650,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </AppLayout>
+    </div>
   )
 }

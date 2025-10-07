@@ -60,7 +60,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/20 hover:border-primary/60 bg-black/50 text-foreground mystical-glow hover-pop-subtle w-full sm:w-auto"
+                  className="text-lg px-8 py-6 border-primary/30 hover:bg-white hover:text-black hover:border-white bg-black/50 text-foreground mystical-glow hover-pop-subtle w-full sm:w-auto transition-all duration-300"
                 >
                   <Moon className="h-5 w-5 mr-2" />
                   View Demo

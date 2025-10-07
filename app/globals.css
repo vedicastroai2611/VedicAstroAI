@@ -1,6 +1,47 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .card-mystical {
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .card-mystical:active {
+    transform: scale(0.98);
+  }
+  
+  .card-mystical .collapsible-trigger {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
 :root {
   /* Black theme - Pure black with mystical accents */
   --background: #000000;
@@ -122,7 +163,7 @@
   text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
-/* Added pop-out hover effects for better interactivity */
+/* Enhanced mystical animations and effects */
 .hover-pop {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -157,4 +198,198 @@
 .hover-lift:hover {
   transform: translateY(-1px);
   background-color: rgba(139, 92, 246, 0.15);
+}
+
+/* Enhanced mystical effects */
+.mystical-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.mystical-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.mystical-border:hover::before {
+  left: 100%;
+}
+
+/* Floating animation for mystical elements */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse glow effect */
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.6), 0 0 60px rgba(139, 92, 246, 0.3);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect for loading states */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Enhanced card hover effects */
+.card-mystical {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-mystical::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(139, 92, 246, 0.1) 50%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-mystical:hover::before {
+  opacity: 1;
+}
+
+.card-mystical:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2), 0 0 30px rgba(139, 92, 246, 0.1);
+}
+
+/* Enhanced button effects */
+.btn-mystical {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-mystical::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-mystical:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Text reveal animation */
+@keyframes text-reveal {
+  0% { 
+    opacity: 0; 
+    transform: translateY(20px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+.text-reveal {
+  animation: text-reveal 0.6s ease-out forwards;
+}
+
+/* Staggered animation delays */
+.animate-delay-100 { animation-delay: 0.1s; }
+.animate-delay-200 { animation-delay: 0.2s; }
+.animate-delay-300 { animation-delay: 0.3s; }
+.animate-delay-400 { animation-delay: 0.4s; }
+.animate-delay-500 { animation-delay: 0.5s; }
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .mystical-glow {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+  }
+  
+  .card-mystical:hover {
+    transform: translateY(-2px);
+  }
+  
+  .hover-pop:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+  }
+}
+
+@media (max-width: 480px) {
+  .mystical-glow {
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.15);
+  }
+  
+  .card-mystical:hover {
+    transform: translateY(-1px);
+  }
+  
+  .hover-pop:hover {
+    transform: translateY(-1px) scale(1.005);
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 6px rgba(139, 92, 246, 0.2);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .float-animation,
+  .pulse-glow,
+  .text-reveal,
+  .shimmer {
+    animation: none;
+  }
+  
+  .hover-pop,
+  .hover-pop-subtle,
+  .hover-lift,
+  .card-mystical {
+    transition: none;
+  }
+  
+  .hover-pop:hover,
+  .hover-pop-subtle:hover,
+  .hover-lift:hover,
+  .card-mystical:hover {
+    transform: none;
+  }
 }

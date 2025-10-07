@@ -3,6 +3,10 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
+import { ReduxProvider } from "@/lib/store/provider"
+import { AuthProvider } from "@/lib/contexts/AuthContext"
+import { ChartDataProvider } from "@/lib/contexts/ChartDataContext"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 const inter = Inter({
@@ -53,6 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Vedic Astro AI" />
@@ -61,7 +66,14 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.jpg" />
       </head>
       <body className={`font-sans ${inter.variable} antialiased bg-black text-white min-h-screen overflow-x-hidden`}>
-        <Suspense fallback={null}>{children}</Suspense>
+        <AuthProvider>
+          <ReduxProvider>
+            <ChartDataProvider>
+              <Suspense fallback={null}>{children}</Suspense>
+              <Toaster />
+            </ChartDataProvider>
+          </ReduxProvider>
+        </AuthProvider>
         <Analytics />
       </body>
     </html>

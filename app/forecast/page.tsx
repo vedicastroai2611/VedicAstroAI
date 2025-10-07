@@ -122,31 +122,39 @@ export default function ForecastPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-background">
         {/* Header */}
-        <div className="bg-black border-b border-purple-500/30">
-          <div className="container mx-auto px-4 py-6">
+        <div className="border-b border-primary/30 bg-gradient-to-r from-background via-primary/5 to-accent/5 relative overflow-hidden">
+          {/* Mystical background elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl"></div>
+          
+          <div className="container mx-auto px-4 py-6 relative z-10">
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold text-white">Forecast</h1>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+              <h1 className="text-2xl font-bold text-foreground text-glow">Forecast</h1>
+              <Button variant="ghost" size="sm" className="text-foreground hover:bg-primary/20 hover-lift">
                 <Bell className="h-4 w-4" />
               </Button>
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex bg-white/20 rounded-lg p-1 max-w-md mx-auto">
+            <div className="flex bg-primary/10 border border-primary/20 rounded-lg p-1 max-w-md mx-auto mystical-border">
               <button
                 onClick={() => setActiveTab("daily")}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === "daily" ? "bg-white text-purple-600" : "text-white hover:bg-white/10"
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 ${
+                  activeTab === "daily" 
+                    ? "bg-primary text-primary-foreground mystical-glow" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-primary/20"
                 }`}
               >
                 Daily
               </button>
               <button
                 onClick={() => setActiveTab("weekly")}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === "weekly" ? "bg-white text-purple-600" : "text-white hover:bg-white/10"
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 ${
+                  activeTab === "weekly" 
+                    ? "bg-primary text-primary-foreground mystical-glow" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-primary/20"
                 }`}
               >
                 Weekly
@@ -159,33 +167,33 @@ export default function ForecastPage() {
           {activeTab === "daily" ? (
             <div className="space-y-6">
               {/* Today's Forecast */}
-              <Card className="bg-black border-purple-500/30">
+              <Card className="border-primary/30 bg-card/50 backdrop-blur-sm card-mystical text-reveal">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-white">Today's Forecast</h2>
-                    <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
+                    <h2 className="text-xl font-bold text-foreground text-glow">Today's Forecast</h2>
+                    <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30 mystical-border">
                       {dailyForecast.status}
                     </Badge>
                   </div>
-                  <p className="text-gray-300 mb-6">{dailyForecast.message}</p>
+                  <p className="text-muted-foreground mb-6">{dailyForecast.message}</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-400">Lucky Number</p>
-                      <p className="text-2xl font-bold text-purple-400">{dailyForecast.luckyNumber}</p>
+                    <div className="text-center p-4 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all duration-300 hover-lift">
+                      <p className="text-sm text-muted-foreground">Lucky Number</p>
+                      <p className="text-2xl font-bold text-primary mystical-glow">{dailyForecast.luckyNumber}</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-400">Lucky Color</p>
+                    <div className="text-center p-4 rounded-lg border border-accent/20 bg-accent/5 hover:bg-accent/10 transition-all duration-300 hover-lift">
+                      <p className="text-sm text-muted-foreground">Lucky Color</p>
                       <div className="flex items-center justify-center gap-2">
-                        <div className="w-4 h-4 bg-yellow-400 rounded-full"></div>
-                        <p className="font-semibold text-white">{dailyForecast.luckyColor}</p>
+                        <div className="w-4 h-4 bg-yellow-400 rounded-full mystical-glow"></div>
+                        <p className="font-semibold text-foreground">{dailyForecast.luckyColor}</p>
                       </div>
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-400">Moon Phase</p>
+                    <div className="text-center p-4 rounded-lg border border-secondary/20 bg-secondary/5 hover:bg-secondary/10 transition-all duration-300 hover-lift">
+                      <p className="text-sm text-muted-foreground">Moon Phase</p>
                       <div className="flex items-center justify-center gap-2">
-                        <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-                        <p className="font-semibold text-white">{dailyForecast.moonPhase}</p>
+                        <div className="w-4 h-4 bg-muted-foreground rounded-full mystical-glow"></div>
+                        <p className="font-semibold text-foreground">{dailyForecast.moonPhase}</p>
                       </div>
                     </div>
                   </div>
@@ -194,18 +202,18 @@ export default function ForecastPage() {
 
               {/* Forecast Categories */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {dailyForecast.categories.map((category) => (
-                  <Card key={category.name} className="bg-black border-purple-500/30">
+                {dailyForecast.categories.map((category, index) => (
+                  <Card key={category.name} className="border-primary/30 bg-card/50 backdrop-blur-sm card-mystical text-reveal" style={{ animationDelay: `${index * 0.1}s` }}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="text-2xl">{category.icon}</div>
+                          <div className="text-2xl float-animation" style={{ animationDelay: `${index * 0.2}s` }}>{category.icon}</div>
                           <div>
-                            <h3 className="font-semibold text-white">{category.name}</h3>
-                            <p className="text-sm text-gray-400">{category.description}</p>
+                            <h3 className="font-semibold text-foreground">{category.name}</h3>
+                            <p className="text-sm text-muted-foreground">{category.description}</p>
                           </div>
                         </div>
-                        <Badge className={`${category.color} border-0`}>{category.status}</Badge>
+                        <Badge className={`${category.color} border-0 mystical-border`}>{category.status}</Badge>
                       </div>
                     </CardContent>
                   </Card>
@@ -213,33 +221,33 @@ export default function ForecastPage() {
               </div>
 
               {/* Quote */}
-              <Card className="border-2 border-pink-500 bg-black/90 text-white">
+              <Card className="border-2 border-accent/50 bg-accent/5 backdrop-blur-sm card-mystical text-reveal animate-delay-400">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="text-3xl opacity-80">🕉️</div>
+                    <div className="text-3xl opacity-80 float-animation">🕉️</div>
                     <div>
-                      <blockquote className="text-lg mb-2">"{dailyForecast.quote.text}"</blockquote>
-                      <cite className="text-sm opacity-80">- {dailyForecast.quote.source}</cite>
+                      <blockquote className="text-lg mb-2 text-foreground italic">"{dailyForecast.quote.text}"</blockquote>
+                      <cite className="text-sm text-muted-foreground">- {dailyForecast.quote.source}</cite>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Today's Planetary Influence */}
-              <Card className="bg-black border-purple-500/30">
+              <Card className="border-primary/30 bg-card/50 backdrop-blur-sm card-mystical text-reveal animate-delay-500">
                 <CardContent className="p-6">
-                  <h2 className="text-xl font-bold mb-4 text-white">Today's Planetary Influence</h2>
+                  <h2 className="text-xl font-bold mb-4 text-foreground text-glow">Today's Planetary Influence</h2>
                   <div className="space-y-4">
-                    {dailyForecast.planetaryInfluence.map((influence) => (
+                    {dailyForecast.planetaryInfluence.map((influence, index) => (
                       <div
                         key={influence.planet}
-                        className="flex items-center justify-between p-4 rounded-lg bg-gray-900/50 border border-purple-500/20"
+                        className="flex items-center justify-between p-4 rounded-lg bg-background/50 border border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all duration-300 hover-lift"
                       >
                         <div>
-                          <h3 className="font-semibold text-white">{influence.planet}</h3>
-                          <p className="text-sm text-gray-400">{influence.description}</p>
+                          <h3 className="font-semibold text-foreground">{influence.planet}</h3>
+                          <p className="text-sm text-muted-foreground">{influence.description}</p>
                         </div>
-                        <Badge className={influence.color}>{influence.strength}</Badge>
+                        <Badge className={`${influence.color} mystical-border`}>{influence.strength}</Badge>
                       </div>
                     ))}
                   </div>
